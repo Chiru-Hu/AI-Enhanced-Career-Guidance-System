@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Career Report — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body{margin:0;font-family:Inter,system-ui;background:linear-gradient(160deg,#06102a,#081336);color:#dbe8ff;min-height:100vh;}
+.card-glass{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);border-radius:16px;box-shadow:0 20px 50px rgba(2,6,23,0.55);}
+.box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;}
+.small-muted{color:rgba(219,232,255,0.72);}
+</style>
+</head>
+<body>
+<div class="container py-4" style="max-width:1100px;">
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card-glass p-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h3 class="text-white mb-1"><i class="bi bi-compass"></i> Child Career & Course Report</h3>
+        <div class="small-muted">
+          Child: <b class="text-white">{{ child_user.username }}</b> •
+          Subject: <b class="text-white">{{ subject }}</b> •
+          Score: <b class="text-white">{{ attempt.score }}/{{ attempt.total }}</b>
+        </div>
+        <div class="small-muted">Model: <b class="text-white">{{ model_used }}</b></div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-light btn-sm" href="{% url 'parent_dashboard' %}">
+          <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <a class="btn btn-success btn-sm" href="{% url 'parent_child_career_pdf' child_user.id %}">
+          <i class="bi bi-file-earmark-pdf"></i> Download PDF
+        </a>
+      </div>
+    </div>
+
+    <hr class="border-light opacity-25">
+
+    <div class="box mb-3">
+      <h5 class="text-white mb-1">Summary</h5>
+      <div class="small-muted">{{ report.summary }}</div>
+      <div class="mt-2">
+        <span class="badge bg-info text-dark">Aptitude: {{ report.aptitude_level }}</span>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2">Strengths</h6>
+          <ul class="mb-0">
+            {% for s in report.strengths %}
+              <li class="small-muted">{{ s }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2">Improvement Areas</h6>
+          <ul class="mb-0">
+            {% for s in report.improvement_areas %}
+              <li class="small-muted">{{ s }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="box mt-3">
+      <h5 class="text-white mb-2">Top Career Paths</h5>
+      <div class="row g-3">
+        {% for c in report.top_career_paths %}
+          <div class="col-md-6">
+            <div class="box">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="text-white mb-0">{{ c.career }}</h6>
+                <span class="badge bg-success">Fit {{ c.fit_score }}%</span>
+              </div>
+              <div class="small-muted mt-2">{{ c.why_fit }}</div>
+
+              <div class="small-muted mt-2"><b>Roles:</b> {{ c.roles|join:", " }}</div>
+              <div class="small-muted mt-1"><b>Missing skills:</b> {{ c.missing_skills|join:", " }}</div>
+              <div class="small-muted mt-1"><b>Projects:</b> {{ c.projects|join:", " }}</div>
+
+              <hr class="border-light opacity-25 my-2">
+
+              <div class="small-muted"><b>30 Days:</b> {{ c.roadmap_30_60_90.days_30|join:" • " }}</div>
+              <div class="small-muted"><b>60 Days:</b> {{ c.roadmap_30_60_90.days_60|join:" • " }}</div>
+              <div class="small-muted"><b>90 Days:</b> {{ c.roadmap_30_60_90.days_90|join:" • " }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="box mt-3">
+      <h5 class="text-white mb-2">Course Recommendations</h5>
+      <div class="row g-3">
+        {% for c in report.course_recommendations %}
+          <div class="col-md-6">
+            <div class="box">
+              <div class="text-white fw-bold">{{ c.title }}</div>
+              <div class="small-muted">{{ c.platform }} • {{ c.level }} • {{ c.duration_weeks }} weeks</div>
+              <div class="small-muted mt-1">{{ c.why }}</div>
+              <div class="small-muted mt-2">
+                <a class="text-info" target="_blank" href="{{ c.url }}">Open Link</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="box mt-3">
+      <h5 class="text-white mb-2">Next Actions</h5>
+      <ul class="mb-0">
+        {% for a in report.next_actions %}
+          <li class="small-muted">{{ a }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

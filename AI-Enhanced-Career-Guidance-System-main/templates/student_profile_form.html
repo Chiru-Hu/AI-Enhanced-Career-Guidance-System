@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Profile — AI CareerWise</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#06102a;
+  --accent:#0d6efd;
+  --accent2:#6610f2;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.10);
+  --text:#dbe8ff;
+  --card-bg:rgba(255,255,255,0.03);
+  --card-border:rgba(255,255,255,0.06);
+  --hover:#0d6efd33;
+}
+
+body{
+  margin:0;
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background: linear-gradient(160deg,#06102a,#081336);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Animated Orbs Background */
+.bg-orbs{position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none;}
+.orb{position:absolute; width:520px; height:520px; border-radius:50%; filter: blur(40px); opacity:.35; animation: float 10s ease-in-out infinite;}
+.orb.one{background: radial-gradient(circle at 30% 30%, #0d6efd, transparent 60%); left:-120px; top:-120px;}
+.orb.two{background: radial-gradient(circle at 30% 30%, #6610f2, transparent 60%); right:-150px; top:40px; animation-duration:12s;}
+.orb.three{background: radial-gradient(circle at 30% 30%, #20c997, transparent 60%); left:20%; bottom:-220px; animation-duration:14s;}
+@keyframes float{0%{transform:translate(0,0) scale(1);}50%{transform:translate(20px,-25px) scale(1.05);}100%{transform:translate(0,0) scale(1);}}
+
+/* Navbar */
+.navbar{background:var(--glass); backdrop-filter: blur(12px); border-bottom:1px solid var(--glass-border);}
+.navbar-brand{color:#fff;font-weight:800;letter-spacing:.2px;}
+.navbar .btn{border-radius:10px;font-weight:700;}
+
+/* Layout */
+.dashboard{display:flex; min-height:calc(100vh - 64px);}
+
+/* Sidebar */
+.sidebar{width:260px;background:var(--glass);backdrop-filter:blur(12px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;padding:18px 12px;}
+.sidebar .profile{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.sidebar .avatar{width:50px;height:50px;background:linear-gradient(135deg,#ff6f61,#ffca28);border-radius:12px;display:grid;place-items:center;font-weight:800;color:#042030;}
+.sidebar a{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:8px;border-radius:10px;color:#dbe8ff;text-decoration:none;transition:0.2s;}
+.sidebar a:hover{background:var(--hover);color:#fff;}
+.sidebar a.active{background:rgba(13,110,253,0.22);border:1px solid rgba(13,110,253,0.30);color:#fff;}
+
+/* Main */
+.main{flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;}
+
+/* Panel */
+.panel{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 20px 50px rgba(2,6,23,0.55);
+  position:relative;
+  overflow:hidden;
+}
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background: conic-gradient(from 180deg, rgba(13,110,253,.0), rgba(13,110,253,.35), rgba(102,16,242,.35), rgba(13,110,253,.0));
+  filter: blur(18px);
+  opacity:.45;
+  animation: glowspin 6s linear infinite;
+  z-index:0;
+}
+@keyframes glowspin{ to{ transform: rotate(360deg);} }
+.panel > *{position:relative; z-index:1;}
+
+.section{background:var(--card-bg);border:1px solid var(--card-border);border-radius:14px;padding:16px;margin-top:12px;}
+.section h6{margin:0 0 10px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;}
+
+.badge-soft{background:rgba(13,110,253,0.18);border:1px solid rgba(13,110,253,0.28);color:#dbe8ff;border-radius:999px;padding:6px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;}
+
+.form-label{color:#fff;font-weight:700;font-size:13px;margin-bottom:6px;}
+.form-control,.form-select,textarea{
+  background:rgba(255,255,255,0.08) !important;
+  border:1px solid rgba(255,255,255,0.14) !important;
+  color:#fff !important;
+  border-radius:12px !important;
+}
+.form-control:focus,.form-select:focus,textarea:focus{
+  border-color: rgba(13,110,253,.85) !important;
+  box-shadow:0 0 0 .2rem rgba(13,110,253,.18) !important;
+}
+/* White placeholder */
+.form-control::placeholder, textarea::placeholder{color:#fff !important; opacity:0.75 !important;}
+
+.helper{font-size:12px;color:rgba(219,232,255,0.72);margin-top:6px;}
+.preview-box{background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.16);border-radius:14px;padding:12px;}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.btn{border-radius:12px;font-weight:800;}
+
+.invalid-feedback{display:block;} /* always show when present */
+
+@media(max-width:900px){
+  .dashboard{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}
+  .sidebar a{white-space:nowrap;}
+}
+</style>
+</head>
+
+<body>
+<div class="bg-orbs">
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
+</div>
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span class="text-light">Hello, {{ request.user.username }} (Student)</span>
+    <a href="{% url 'student_dashboard' %}" class="btn btn-outline-light btn-sm">Dashboard</a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-warning btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong class="text-white">{{ request.user.username }}</strong>
+        <div style="font-size:13px;color:#dbe8ff99">Student</div>
+      </div>
+    </div>
+
+    <a href="{% url 'student_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a>
+    <a class="active" href="{% url 'student_profile' %}"><i class="bi bi-person-badge"></i> Create Profile</a>
+    <a href="#"><i class="bi bi-journal-text"></i> My Courses</a>
+    <a href="#"><i class="bi bi-clipboard-check"></i> Aptitude Test</a>
+    <a href="#"><i class="bi bi-stars"></i> AI Counselor</a>
+    <a href="#"><i class="bi bi-briefcase"></i> Jobs & Internships</a>
+    <a href="#"><i class="bi bi-bell"></i> Notifications</a>
+  </aside>
+
+  <main class="main">
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-info mb-0">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- ✅ SHOW EXACT FORM ERRORS HERE -->
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <b>Fix these errors:</b>
+        <ul class="mb-0">
+          {% for field, errors in form.errors.items %}
+            <li><b>{{ field|capfirst }}:</b> {{ errors|striptags }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="panel">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h4 class="mb-1" style="color:#fff;font-weight:900;">Create Student Profile</h4>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge-soft"><i class="bi bi-shield-check"></i> Personalized aptitude + career roadmap</span>
+            <span class="badge-soft"><i class="bi bi-lightning-charge"></i> Skill & interest based recommendations</span>
+          </div>
+        </div>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-arrow-left"></i> Back
+        </a>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+
+        <!-- PERSONAL DETAILS -->
+        <div class="section">
+          <h6><i class="bi bi-person-badge"></i> Personal Details</h6>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input class="form-control {% if form.full_name.errors %}is-invalid{% endif %}"
+                     name="full_name"
+                     value="{{ form.full_name.value|default_if_none:'' }}"
+                     placeholder="Enter full name">
+              {% for e in form.full_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                     name="email"
+                     value="{{ form.email.value|default_if_none:'' }}"
+                     placeholder="Enter email">
+              {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Phone</label>
+              <input class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                     name="phone"
+                     value="{{ form.phone.value|default_if_none:'' }}"
+                     placeholder="Enter phone number">
+              {% for e in form.phone.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Date of Birth</label>
+              <input type="date"
+                     class="form-control {% if form.dob.errors %}is-invalid{% endif %}"
+                     name="dob"
+                     value="{{ form.dob.value|default_if_none:'' }}">
+              {% for e in form.dob.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Gender</label>
+              <select class="form-select {% if form.gender.errors %}is-invalid{% endif %}" name="gender">
+                <option value="" {% if not form.gender.value %}selected{% endif %}>Select</option>
+                <option value="Male" {% if form.gender.value == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" {% if form.gender.value == "Female" %}selected{% endif %}>Female</option>
+                <option value="Other" {% if form.gender.value == "Other" %}selected{% endif %}>Other</option>
+                <option value="Prefer not to say" {% if form.gender.value == "Prefer not to say" %}selected{% endif %}>Prefer not to say</option>
+              </select>
+              {% for e in form.gender.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">City</label>
+              <input class="form-control {% if form.city.errors %}is-invalid{% endif %}"
+                     name="city"
+                     value="{{ form.city.value|default_if_none:'' }}"
+                     placeholder="e.g., Pune">
+              {% for e in form.city.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">State</label>
+              <input class="form-control {% if form.state.errors %}is-invalid{% endif %}"
+                     name="state"
+                     value="{{ form.state.value|default_if_none:'' }}"
+                     placeholder="e.g., Maharashtra">
+              {% for e in form.state.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- ACADEMIC DETAILS -->
+        <div class="section">
+          <h6><i class="bi bi-mortarboard"></i> Academic Details</h6>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Highest Education</label>
+              <input class="form-control" name="highest_education"
+                     value="{{ form.highest_education.value|default_if_none:'' }}"
+                     placeholder="e.g., 12th / Diploma / BE / BSc">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Degree</label>
+              <input class="form-control" name="degree"
+                     value="{{ form.degree.value|default_if_none:'' }}"
+                     placeholder="e.g., BE / BTech / BCA / MCA">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Branch / Stream</label>
+              <input class="form-control" name="branch"
+                     value="{{ form.branch.value|default_if_none:'' }}"
+                     placeholder="e.g., CS / IT / E&TC">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">College / Institute</label>
+              <input class="form-control" name="college"
+                     value="{{ form.college.value|default_if_none:'' }}"
+                     placeholder="College name">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Year of Study</label>
+              <input class="form-control" name="year_of_study"
+                     value="{{ form.year_of_study.value|default_if_none:'' }}"
+                     placeholder="e.g., 3rd year">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">CGPA / %</label>
+              <input class="form-control" name="cgpa_or_percent"
+                     value="{{ form.cgpa_or_percent.value|default_if_none:'' }}"
+                     placeholder="e.g., 8.2 / 78%">
+            </div>
+          </div>
+        </div>
+
+        <!-- SKILLS & INTERESTS -->
+        <div class="section">
+          <h6><i class="bi bi-lightning-charge"></i> Skills & Interests</h6>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Skills (comma separated)</label>
+              <input class="form-control {% if form.skills_text.errors %}is-invalid{% endif %}"
+                     name="skills_text"
+                     value="{{ form.skills_text.value|default_if_none:'' }}"
+                     placeholder="Python, SQL, ML, Communication">
+              {% for e in form.skills_text.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+              <div class="helper">Used for aptitude + career recommendations.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Interests (comma separated)</label>
+              <input class="form-control {% if form.interests_text.errors %}is-invalid{% endif %}"
+                     name="interests_text"
+                     value="{{ form.interests_text.value|default_if_none:'' }}"
+                     placeholder="Data Science, UI/UX, Cyber Security">
+              {% for e in form.interests_text.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+              <div class="helper">Used to personalize course suggestions.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Strengths</label>
+              <textarea class="form-control" name="strengths" rows="3"
+                        placeholder="e.g., Problem-solving, teamwork">{{ form.strengths.value|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Weaknesses</label>
+              <textarea class="form-control" name="weaknesses" rows="3"
+                        placeholder="e.g., Public speaking, time management">{{ form.weaknesses.value|default_if_none:'' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAREER PREFERENCES -->
+        <div class="section">
+          <h6><i class="bi bi-bullseye"></i> Career Preferences</h6>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Career Goal</label>
+              <input class="form-control" name="career_goal"
+                     value="{{ form.career_goal.value|default_if_none:'' }}"
+                     placeholder="e.g., Become Data Scientist / Software Engineer">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Preferred Roles</label>
+              <input class="form-control" name="preferred_roles"
+                     value="{{ form.preferred_roles.value|default_if_none:'' }}"
+                     placeholder="e.g., Data Analyst, ML Engineer, Backend Developer">
+            </div>
+          </div>
+        </div>
+
+        <!-- LINKS & DOCUMENTS -->
+        <div class="section">
+          <h6><i class="bi bi-link-45deg"></i> Links & Documents</h6>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">LinkedIn URL</label>
+              <input class="form-control {% if form.linkedin_url.errors %}is-invalid{% endif %}"
+                     name="linkedin_url"
+                     value="{{ form.linkedin_url.value|default_if_none:'' }}"
+                     placeholder="https://linkedin.com/in/...">
+              {% for e in form.linkedin_url.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">GitHub URL</label>
+              <input class="form-control {% if form.github_url.errors %}is-invalid{% endif %}"
+                     name="github_url"
+                     value="{{ form.github_url.value|default_if_none:'' }}"
+                     placeholder="https://github.com/...">
+              {% for e in form.github_url.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Upload Resume (PDF/DOCX)</label>
+              <input type="file" class="form-control" name="resume">
+              {% if student_profile.resume %}
+                <div class="helper">Current: <a class="text-info" href="{{ student_profile.resume.url }}" target="_blank">View Resume</a></div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Upload Photo</label>
+              <input type="file" class="form-control" name="photo">
+              {% if student_profile.photo %}
+                <div class="helper">Current: <a class="text-info" href="{{ student_profile.photo.url }}" target="_blank">View Photo</a></div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <div class="preview-box">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-info-circle"></i>
+                  <div class="small" style="color:#dbe8ffaa;">
+                    Next modules: <b>Aptitude Suggestion</b> → <b>Career & Course Recommendation</b> → <b>Job/Internship Search</b>.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-check2-circle"></i> Save Profile
+          </button>
+          <a href="{% url 'student_dashboard' %}" class="btn btn-outline-light px-4">
+            <i class="bi bi-arrow-left"></i> Back
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

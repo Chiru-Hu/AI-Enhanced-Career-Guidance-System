@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#06102a;
+  --accent:#0d6efd;
+  --accent2:#6610f2;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.09);
+  --text:#dbe8ff;
+  --card-bg:rgba(255,255,255,0.02);
+  --card-border:rgba(255,255,255,0.03);
+  --hover:#0d6efd33;
+}
+body{
+  margin:0;
+  font-family:"Inter",sans-serif;
+  background: linear-gradient(160deg,#06102a,#081336);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.navbar{
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--glass-border);
+}
+.navbar-brand{color:#fff;font-weight:700;}
+.navbar .btn{border-radius:8px;}
+.dashboard{
+  display:flex;
+  min-height:calc(100vh - 56px);
+}
+.sidebar{
+  width:260px;
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  border-right:1px solid var(--glass-border);
+  display:flex;
+  flex-direction:column;
+  padding:20px 12px;
+}
+.sidebar .profile{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
+}
+.sidebar .avatar{
+  width:50px;height:50px;
+  background:linear-gradient(135deg,#4dd0e1,#3f51b5);
+  border-radius:12px;
+  display:grid; place-items:center;
+  font-weight:700;color:#042030;
+}
+.sidebar a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  margin-bottom:8px;
+  border-radius:10px;
+  color:#dbe8ff;text-decoration:none;
+  transition:0.2s;
+}
+.sidebar a:hover{
+  background:var(--hover);
+  color:#fff;
+}
+.main{
+  flex:1;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.panel{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 20px 50px rgba(2,6,23,0.55);
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+.stats-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+}
+.stats-card h5{margin:0;color:#fff;}
+.stats-card p{margin:4px 0 0;color:#dbe8ff99;font-size:13px;}
+
+.child-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  gap:12px;
+}
+.child-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:14px;
+}
+.small-muted{color:rgba(219,232,255,0.72);font-size:13px;}
+
+footer{
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--glass-border);
+  padding:16px 20px;
+  text-align:center;
+  color:#dbe8ffaa;
+  font-size:14px;
+  margin-top:auto;
+}
+@media(max-width:900px){
+  .dashboard{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}
+  .sidebar a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span>Hello, {{ request.user.username }} (Parent)</span>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong>{{ request.user.username }}</strong>
+        <div style="font-size:13px;color:#dbe8ff99">Parent</div>
+      </div>
+    </div>
+
+    <a href="{% url 'parent_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a>
+
+    <a href="{% url 'parent_profile' %}">
+      <i class="bi bi-person-lines-fill"></i> Create / Edit Profile
+    </a>
+
+    <a href="#children"><i class="bi bi-people"></i> My Children</a>
+
+    <!-- ✅ Summary PDF -->
+    <a href="{% url 'parent_progress_pdf' %}">
+      <i class="bi bi-download"></i> Download Summary PDF
+    </a>
+  </aside>
+
+  <main class="main">
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} mb-0">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="stats-grid">
+      <div class="stats-card">
+        <h5>{{ children_count|default:"0" }}</h5>
+        <p>Linked Children</p>
+      </div>
+      <div class="stats-card">
+        <h5>{{ children_progress|length|default:"0" }}</h5>
+        <p>Progress Cards</p>
+      </div>
+      <div class="stats-card">
+        <h5>—</h5>
+        <p>Reports</p>
+      </div>
+      <div class="stats-card">
+        <h5>—</h5>
+        <p>Notifications</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h5>Quick Actions</h5>
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <a href="{% url 'parent_profile' %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-person-lines-fill"></i> Update Parent Profile
+        </a>
+
+        <a href="{% url 'parent_progress_pdf' %}" class="btn btn-success btn-sm">
+          <i class="bi bi-download"></i> Download Summary PDF
+        </a>
+      </div>
+      <div class="small-muted mt-2">
+        Tip: For each child, you can download <b>Assessment PDF</b> and <b>Recommendation PDF</b> from their card below.
+      </div>
+    </div>
+
+    <div id="children" class="panel">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="mb-1">Monitor Child Progress</h5>
+          <div class="small-muted">Only children linked in Parent Profile will be visible.</div>
+        </div>
+        <a class="btn btn-outline-light btn-sm" href="{% url 'parent_profile' %}">
+          <i class="bi bi-plus-circle"></i> Add / Update Children
+        </a>
+      </div>
+
+      <hr class="border-light opacity-25">
+
+      {% if children_progress %}
+        <div class="child-grid">
+          {% for c in children_progress %}
+            <div class="child-card">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="text-white fw-bold">
+                    {{ c.student_profile.full_name|default:c.child_user.username }}
+                  </div>
+                  <div class="small-muted">
+                    {{ c.student_profile.degree|default:"" }} {{ c.student_profile.branch|default:"" }}
+                  </div>
+                </div>
+                <span class="badge bg-info text-dark">Student</span>
+              </div>
+
+              <hr class="border-light opacity-25">
+
+              {% if c.last_attempt %}
+                <div class="small-muted mb-1">
+                  Latest Test: <b class="text-white">{{ c.last_attempt.subject|default:"Subject" }}</b>
+                </div>
+                <div class="small-muted mb-1">
+                  Score: <b class="text-white">{{ c.last_attempt.score }}/{{ c.last_attempt.total }}</b>
+                  {% if c.score_pct != None %} ({{ c.score_pct }}%) {% endif %}
+                </div>
+
+                <div class="progress" style="height:10px;">
+                  <div class="progress-bar" role="progressbar" style="width: {{ c.score_pct|default:0 }}%;"></div>
+                </div>
+
+                <div class="small-muted mt-2">
+                  Completed: <b class="text-white">{{ c.last_attempt.completed_at }}</b>
+                </div>
+
+                {% if c.top_career %}
+                  <div class="small-muted mt-2">
+                    Top Career Suggestion: <b class="text-white">{{ c.top_career }}</b>
+                  </div>
+                {% else %}
+                  <div class="small-muted mt-2">Career report not generated yet.</div>
+                {% endif %}
+
+                <!-- ✅ View + Download Reports -->
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                  <a class="btn btn-outline-light btn-sm"
+                     href="{% url 'parent_child_assessment' c.child_user.id %}">
+                    <i class="bi bi-file-earmark-text"></i> Assessment Report
+                  </a>
+
+                  <a class="btn btn-success btn-sm"
+                     href="{% url 'parent_child_career' c.child_user.id %}">
+                    <i class="bi bi-compass"></i> Recommendation
+                  </a>
+
+                  <!-- ✅ DOWNLOAD PDFs -->
+                  <a class="btn btn-outline-info btn-sm"
+                     href="{% url 'parent_child_assessment_pdf' c.child_user.id %}">
+                    <i class="bi bi-file-earmark-pdf"></i> Assessment PDF
+                  </a>
+
+                  <a class="btn btn-outline-warning btn-sm"
+                     href="{% url 'parent_child_career_pdf' c.child_user.id %}">
+                    <i class="bi bi-file-earmark-pdf"></i> Recommendation PDF
+                  </a>
+                </div>
+
+              {% else %}
+                <div class="small-muted">No assessment submitted yet.</div>
+              {% endif %}
+
+              <div class="small-muted mt-3">
+                Skills: {{ c.student_profile.skills|default:"-" }}
+              </div>
+              <div class="small-muted">
+                Interests: {{ c.student_profile.interests|default:"-" }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="small-muted">
+          No children linked yet. Please add children usernames in
+          <a class="text-info" href="{% url 'parent_profile' %}">Parent Profile</a>.
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  AI CareerWise — Smart AI Counseling Platform © 2025
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
+{% comment %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#06102a; --accent:#0d6efd; --accent2:#6610f2;
+  --glass:rgba(255,255,255,0.06); --glass-border:rgba(255,255,255,0.09);
+  --text:#dbe8ff; --card-bg:rgba(255,255,255,0.02); --card-border:rgba(255,255,255,0.03);
+  --hover:#0d6efd33;
+}
+body{margin:0;font-family:"Inter",sans-serif;background:linear-gradient(160deg,#06102a,#081336);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.navbar{background:var(--glass);backdrop-filter:blur(10px);border-bottom:1px solid var(--glass-border);}
+.navbar-brand{color:#fff;font-weight:700;}
+.navbar .btn{border-radius:8px;}
+.dashboard{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:260px;background:var(--glass);backdrop-filter:blur(12px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;padding:20px 12px;}
+.sidebar .profile{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.sidebar .avatar{width:50px;height:50px;background:linear-gradient(135deg,#4dd0e1,#3f51b5);border-radius:12px;display:grid;place-items:center;font-weight:700;color:#042030;}
+.sidebar a{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:8px;border-radius:10px;color:#dbe8ff;text-decoration:none;transition:0.2s;}
+.sidebar a:hover{background:var(--hover);color:#fff;}
+.main{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;}
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:16px;box-shadow:0 20px 50px rgba(2,6,23,0.55);}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+.stats-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px;text-align:center;}
+.stats-card h5{margin:0;color:#fff;}
+.stats-card p{margin:4px 0 0;color:#dbe8ff99;font-size:13px;}
+.child-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;}
+.child-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px;}
+.small-muted{color:rgba(219,232,255,0.72);font-size:13px;}
+footer{background:var(--glass);backdrop-filter:blur(10px);border-top:1px solid var(--glass-border);padding:16px 20px;text-align:center;color:#dbe8ffaa;font-size:14px;margin-top:auto;}
+@media(max-width:900px){.dashboard{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}.sidebar a{white-space:nowrap;}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span>Hello, {{ request.user.username }} (Parent)</span>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong>{{ request.user.username }}</strong>
+        <div style="font-size:13px;color:#dbe8ff99">Parent</div>
+      </div>
+    </div>
+
+    <a href="{% url 'parent_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a>
+
+    <a href="{% url 'parent_profile' %}">
+      <i class="bi bi-person-lines-fill"></i> Create / Edit Profile
+    </a>
+
+    <a href="#children"><i class="bi bi-people"></i> My Children</a>
+
+    <!-- Summary Progress PDF -->
+    <a href="{% url 'parent_progress_pdf' %}">
+      <i class="bi bi-download"></i> Download Summary PDF
+    </a>
+  </aside>
+
+  <main class="main">
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} mb-0">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="stats-grid">
+      <div class="stats-card">
+        <h5>{{ children_count|default:"0" }}</h5>
+        <p>Linked Children</p>
+      </div>
+      <div class="stats-card">
+        <h5>{{ children_progress|length|default:"0" }}</h5>
+        <p>Progress Cards</p>
+      </div>
+      <div class="stats-card">
+        <h5>—</h5>
+        <p>Reports</p>
+      </div>
+      <div class="stats-card">
+        <h5>—</h5>
+        <p>Notifications</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h5>Quick Actions</h5>
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <a href="{% url 'parent_profile' %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-person-lines-fill"></i> Update Parent Profile
+        </a>
+
+        <a href="{% url 'parent_progress_pdf' %}" class="btn btn-success btn-sm">
+          <i class="bi bi-download"></i> Download Summary PDF
+        </a>
+      </div>
+    </div>
+
+    <div id="children" class="panel">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="mb-1">Monitor Child Progress</h5>
+          <div class="small-muted">Only children linked in Parent Profile will be visible.</div>
+        </div>
+        <a class="btn btn-outline-light btn-sm" href="{% url 'parent_profile' %}">
+          <i class="bi bi-plus-circle"></i> Add / Update Children
+        </a>
+      </div>
+
+      <hr class="border-light opacity-25">
+
+      {% if children_progress %}
+        <div class="child-grid">
+          {% for c in children_progress %}
+            <div class="child-card">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="text-white fw-bold">
+                    {{ c.student_profile.full_name|default:c.child_user.username }}
+                  </div>
+                  <div class="small-muted">
+                    {{ c.student_profile.degree|default:"" }} {{ c.student_profile.branch|default:"" }}
+                  </div>
+                </div>
+                <span class="badge bg-info text-dark">Student</span>
+              </div>
+
+              <hr class="border-light opacity-25">
+
+              {% if c.last_attempt %}
+                <div class="small-muted mb-1">
+                  Latest Test: <b class="text-white">{{ c.last_attempt.subject|default:"Subject" }}</b>
+                </div>
+                <div class="small-muted mb-1">
+                  Score: <b class="text-white">{{ c.last_attempt.score }}/{{ c.last_attempt.total }}</b>
+                  {% if c.score_pct != None %} ({{ c.score_pct }}%) {% endif %}
+                </div>
+
+                <div class="progress" style="height:10px;">
+                  <div class="progress-bar" role="progressbar"
+                       style="width: {{ c.score_pct|default:0 }}%;"></div>
+                </div>
+
+                <div class="small-muted mt-2">
+                  Completed: <b class="text-white">{{ c.last_attempt.completed_at }}</b>
+                </div>
+
+                {% if c.top_career %}
+                  <div class="small-muted mt-2">
+                    Top Career Suggestion: <b class="text-white">{{ c.top_career }}</b>
+                  </div>
+                {% else %}
+                  <div class="small-muted mt-2">Career report not generated yet.</div>
+                {% endif %}
+
+                <!-- ✅ View + Download -->
+                <div class="d-flex gap-2 flex-wrap mt-3">
+
+                  <!-- View Assessment -->
+                  <a class="btn btn-outline-light btn-sm"
+                     href="{% url 'parent_child_assessment' c.child_user.id %}">
+                    <i class="bi bi-file-earmark-text"></i> Assessment Report
+                  </a>
+
+                  <!-- View Recommendation -->
+                  <a class="btn btn-success btn-sm"
+                     href="{% url 'parent_child_career' c.child_user.id %}">
+                    <i class="bi bi-compass"></i> Recommendation
+                  </a>
+
+                  <!-- ✅ ONE CLICK Combined PDF -->
+                  <a class="btn btn-warning btn-sm"
+                     href="{% url 'parent_child_full_report_pdf' c.child_user.id %}">
+                    <i class="bi bi-file-earmark-pdf"></i> Full Report PDF
+                  </a>
+
+                </div>
+
+              {% else %}
+                <div class="small-muted">No assessment submitted yet.</div>
+              {% endif %}
+
+              <div class="small-muted mt-3">
+                Skills: {{ c.student_profile.skills|default:"-" }}
+              </div>
+              <div class="small-muted">
+                Interests: {{ c.student_profile.interests|default:"-" }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="small-muted">
+          No children linked yet. Please add children usernames in
+          <a class="text-info" href="{% url 'parent_profile' %}">Parent Profile</a>.
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  AI CareerWise — Smart AI Counseling Platform © 2025
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> {% endcomment %}

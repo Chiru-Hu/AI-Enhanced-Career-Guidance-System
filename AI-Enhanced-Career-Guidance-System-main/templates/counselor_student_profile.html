@@ -1,0 +1,427 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Counselor • Student Profile — AI CareerWise</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#06102a;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.10);
+  --text:#dbe8ff;
+  --muted:rgba(219,232,255,0.72);
+  --hover:#0d6efd33;
+}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(160deg,#06102a,#081336);
+  color:var(--text);
+  min-height:100vh;
+}
+.navbar{
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--glass-border);
+}
+.card-glass{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  box-shadow:0 20px 50px rgba(2,6,23,0.55);
+}
+.box{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  padding:14px;
+}
+.small-muted{color:var(--muted);font-size:13px;}
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);
+  color:#dbe8ff;
+  font-size:12px;
+  margin:4px 6px 0 0;
+}
+.kv{
+  display:grid;
+  grid-template-columns: 160px 1fr;
+  gap:8px 14px;
+}
+.kv .k{color:rgba(219,232,255,0.72);font-size:13px;}
+.kv .v{color:#fff;font-size:13px;}
+</style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand text-white fw-bold" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <a href="{% url 'counselor_dashboard' %}" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-house"></i> Dashboard
+    </a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-warning btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width:1100px;">
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card-glass p-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h3 class="text-white mb-1"><i class="bi bi-person-badge"></i> Student Profile</h3>
+        <div class="small-muted">
+          Student: <b class="text-white">
+            {% if student_profile and student_profile.full_name %}
+              {{ student_profile.full_name }}
+            {% else %}
+              {{ student_user.username }}
+            {% endif %}
+          </b>
+          • Username: <b class="text-white">{{ student_user.username }}</b>
+        </div>
+
+        {% if last_attempt %}
+          <div class="small-muted mt-2 d-flex flex-wrap gap-2">
+            <span class="pill"><i class="bi bi-book"></i> {{ last_attempt.subject|default:"-" }}</span>
+            <span class="pill"><i class="bi bi-award"></i> {{ last_attempt.score }}/{{ last_attempt.total }}</span>
+            {% if score_pct != None %}
+              <span class="pill"><i class="bi bi-graph-up"></i> {{ score_pct }}%</span>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="small-muted mt-2">
+            No assessment submitted yet.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ✅ Use direct paths (no NoReverseMatch risk) -->
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-info btn-sm" href="/counselor/student/{{ student_user.id }}/assessment/">
+          <i class="bi bi-file-earmark-text"></i> Assessment
+        </a>
+        <a class="btn btn-success btn-sm" href="/counselor/student/{{ student_user.id }}/career/">
+          <i class="bi bi-compass"></i> Career Report
+        </a>
+        <a class="btn btn-outline-warning btn-sm" href="/counselor/student/{{ student_user.id }}/notes/">
+          <i class="bi bi-journal-text"></i> Notes & Feedback
+        </a>
+      </div>
+    </div>
+
+    <hr class="border-light opacity-25">
+
+    <!-- Progress -->
+    <div class="box mt-3">
+  <h5 class="text-white mb-2"><i class="bi bi-graph-up"></i> Progress</h5>
+
+  {% if last_attempt %}
+    <div class="small-muted mb-1">
+      Latest Test: <b class="text-white">{{ latest_subject }}</b>
+    </div>
+    <div class="small-muted mb-2">
+      Score: <b class="text-white">{{ last_attempt.score }}/{{ last_attempt.total }}</b>
+      <span class="badge bg-info text-dark ms-2">{{ score_pct }}%</span>
+    </div>
+
+    <div class="progress" style="height:12px;">
+      <div class="progress-bar bg-success" role="progressbar"
+           style="width: {{ score_pct }}%;"
+           aria-valuenow="{{ score_pct }}" aria-valuemin="0" aria-valuemax="100">
+      </div>
+    </div>
+
+    <div class="small-muted mt-2">
+      Completed: <b class="text-white">{{ completed_at }}</b>
+    </div>
+    {% else %}
+        <div class="small-muted">No submitted assessment found yet.</div>
+    {% endif %}
+    </div>
+
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2"><i class="bi bi-info-circle"></i> Basic Info</h6>
+
+          <div class="kv">
+            <div class="k">Email</div>
+            <div class="v">{% if student_profile %}{{ student_profile.email|default:"-" }}{% else %}-{% endif %}</div>
+
+            <div class="k">Phone</div>
+            <div class="v">{% if student_profile %}{{ student_profile.phone|default:"-" }}{% else %}-{% endif %}</div>
+
+            <div class="k">City / State</div>
+            <div class="v">
+              {% if student_profile %}
+                {{ student_profile.city|default:"-" }}{% if student_profile.state %}, {{ student_profile.state }}{% endif %}
+              {% else %}-{% endif %}
+            </div>
+
+            <div class="k">Education</div>
+            <div class="v">
+              {% if student_profile %}
+                {{ student_profile.highest_education|default:"-" }}
+              {% else %}-{% endif %}
+            </div>
+
+            <div class="k">Degree / Branch</div>
+            <div class="v">
+              {% if student_profile %}
+                {{ student_profile.degree|default:"-" }}{% if student_profile.branch %} • {{ student_profile.branch }}{% endif %}
+              {% else %}-{% endif %}
+            </div>
+
+            <div class="k">College</div>
+            <div class="v">{% if student_profile %}{{ student_profile.college|default:"-" }}{% else %}-{% endif %}</div>
+
+            <div class="k">Year / CGPA</div>
+            <div class="v">
+              {% if student_profile %}
+                {{ student_profile.year_of_study|default:"-" }}{% if student_profile.cgpa_or_percent %} • {{ student_profile.cgpa_or_percent }}{% endif %}
+              {% else %}-{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills & Interests -->
+    <div class="box mt-3">
+      <h6 class="text-white mb-2"><i class="bi bi-lightning-charge"></i> Skills & Interests</h6>
+
+      <div class="small-muted mb-1"><b class="text-white">Skills:</b></div>
+      <div>
+        {% if student_profile and student_profile.skills %}
+          {% for s in student_profile.skills %}
+            <span class="pill"><i class="bi bi-check2-circle"></i> {{ s }}</span>
+          {% endfor %}
+        {% else %}
+          <div class="small-muted">-</div>
+        {% endif %}
+      </div>
+
+      <div class="small-muted mt-3 mb-1"><b class="text-white">Interests:</b></div>
+      <div>
+        {% if student_profile and student_profile.interests %}
+          {% for s in student_profile.interests %}
+            <span class="pill"><i class="bi bi-stars"></i> {{ s }}</span>
+          {% endfor %}
+        {% else %}
+          <div class="small-muted">-</div>
+        {% endif %}
+      </div>
+
+      {% if student_profile and student_profile.career_goal %}
+        <div class="small-muted mt-3">
+          <b class="text-white">Career Goal:</b> {{ student_profile.career_goal }}
+        </div>
+      {% endif %}
+
+      {% if student_profile and student_profile.preferred_roles %}
+        <div class="small-muted mt-1">
+          <b class="text-white">Preferred Roles:</b> {{ student_profile.preferred_roles }}
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+ {% endcomment %}
+
+
+
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Counselor • Student Profile — AI CareerWise</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root{--glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.10);--text:#dbe8ff;--muted:rgba(219,232,255,0.72);}
+body{margin:0;font-family:Inter,system-ui;background:linear-gradient(160deg,#06102a,#081336);color:var(--text);min-height:100vh;}
+.navbar{background:var(--glass);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-border);}
+.card-glass{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;box-shadow:0 20px 50px rgba(2,6,23,0.55);}
+.box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;}
+.small-muted{color:var(--muted);font-size:13px;}
+</style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand text-white fw-bold" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <a href="{% url 'counselor_dashboard' %}" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-house"></i> Dashboard
+    </a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-warning btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width:1100px;">
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card-glass p-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h3 class="text-white mb-1"><i class="bi bi-person-badge"></i> Student Profile</h3>
+        <div class="small-muted">
+          Student:
+          <b class="text-white">
+            {% if student_profile and student_profile.full_name %}
+              {{ student_profile.full_name }}
+            {% else %}
+              {{ student_user.username }}
+            {% endif %}
+          </b>
+          • Username: <b class="text-white">{{ student_user.username }}</b>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-info btn-sm" href="/counselor/student/{{ student_user.id }}/assessment/">
+          <i class="bi bi-file-earmark-text"></i> Assessment
+        </a>
+        <a class="btn btn-outline-light btn-sm" href="/counselor/student/{{ student_user.id }}/career/">
+          <i class="bi bi-compass"></i> Career Report
+        </a>
+      </div>
+    </div>
+
+    <hr class="border-light opacity-25">
+
+    <!-- ✅ Progress -->
+    <div class="box">
+      <h5 class="text-white mb-2"><i class="bi bi-graph-up"></i> Progress</h5>
+
+      {% if last_attempt %}
+        <div class="small-muted mb-1">Latest Test: <b class="text-white">{{ latest_subject }}</b></div>
+        <div class="small-muted mb-2">
+          Score: <b class="text-white">{{ last_attempt.score }}/{{ last_attempt.total }}</b>
+          <span class="badge bg-info text-dark ms-2">{{ score_pct }}%</span>
+        </div>
+
+        <div class="progress" style="height:12px;">
+          <div class="progress-bar bg-success" role="progressbar"
+               style="width: {{ score_pct }}%;"
+               aria-valuenow="{{ score_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+        <div class="small-muted mt-2">Completed: <b class="text-white">{{ completed_at }}</b></div>
+      {% else %}
+        <div class="small-muted">No submitted assessment found yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- ✅ Profile details -->
+    <div class="row g-3 mt-2">
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2"><i class="bi bi-info-circle"></i> Profile Details</h6>
+          <div class="small-muted"><b class="text-white">Degree:</b> {{ student_profile.degree|default:"-" }}</div>
+          <div class="small-muted"><b class="text-white">Branch:</b> {{ student_profile.branch|default:"-" }}</div>
+          <div class="small-muted"><b class="text-white">Year:</b> {{ student_profile.year_of_study|default:"-" }}</div>
+          <div class="small-muted"><b class="text-white">City:</b> {{ student_profile.city|default:"-" }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2"><i class="bi bi-stars"></i> Skills & Interests</h6>
+          <div class="small-muted"><b class="text-white">Skills:</b> {{ student_profile.skills|default:"-" }}</div>
+          <div class="small-muted"><b class="text-white">Interests:</b> {{ student_profile.interests|default:"-" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Counselor Notes -->
+    <div class="box mt-3">
+      <h5 class="text-white mb-2"><i class="bi bi-journal-text"></i> Notes & Feedback</h5>
+
+      <form method="post" class="row g-2">
+        {% csrf_token %}
+        <div class="col-md-6">
+          <label class="small-muted mb-1">Title</label>
+          {{ form.title }}
+        </div>
+        <div class="col-md-2">
+          <label class="small-muted mb-1">Rating (0–5)</label>
+          {{ form.rating }}
+        </div>
+        <div class="col-12">
+          <label class="small-muted mb-1">Notes</label>
+          {{ form.note }}
+        </div>
+        <div class="col-12">
+          <label class="small-muted mb-1">Next Action</label>
+          {{ form.next_action }}
+        </div>
+        <div class="col-12 d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary btn-sm" type="submit">
+            <i class="bi bi-save"></i> Save Notes
+          </button>
+        </div>
+      </form>
+
+      <hr class="border-light opacity-25">
+
+      <h6 class="text-white mb-2">Previous Notes</h6>
+
+      {% if notes %}
+        <div class="d-flex flex-column gap-2">
+          {% for n in notes %}
+            <div class="box">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="text-white fw-bold">{{ n.title|default:"(No title)" }}</div>
+                  <div class="small-muted">{{ n.created_at }}</div>
+                </div>
+                <span class="badge bg-success">Rating: {{ n.rating }}</span>
+              </div>
+
+              <div class="small-muted mt-2"><b class="text-white">Note:</b> {{ n.note }}</div>
+
+              {% if n.next_action %}
+                <div class="small-muted mt-2"><b class="text-white">Next action:</b> {{ n.next_action }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="small-muted">No notes added yet.</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

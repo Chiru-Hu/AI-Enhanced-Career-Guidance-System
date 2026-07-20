@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#06102a;
+  --accent:#0d6efd;
+  --accent2:#6610f2;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.09);
+  --text:#dbe8ff;
+  --card-bg:rgba(255,255,255,0.02);
+  --card-border:rgba(255,255,255,0.03);
+  --hover:#0d6efd33;
+  --green:#4caf50;
+  --orange:#ff9800;
+  --red:#f44336;
+}
+
+body{
+  margin:0;
+  font-family:"Inter",sans-serif;
+  background: linear-gradient(160deg,#06102a,#081336);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Navbar */
+.navbar{
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--glass-border);
+}
+.navbar-brand{color:#fff;font-weight:700;}
+.navbar-nav .nav-link{color:#dbe8ff;}
+.navbar-nav .nav-link:hover{color:var(--accent);}
+.navbar .btn{border-radius:8px;}
+
+/* Layout */
+.dashboard{
+  display:flex;
+  min-height:calc(100vh - 56px);
+}
+
+/* Sidebar */
+.sidebar{
+  width:260px;
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  border-right:1px solid var(--glass-border);
+  display:flex;
+  flex-direction:column;
+  padding:20px 12px;
+}
+.sidebar .profile{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
+}
+.sidebar .avatar{
+  width:50px;height:50px;
+  background:linear-gradient(135deg,#ff6f61,#ffca28);
+  border-radius:12px;
+  display:grid; place-items:center;
+  font-weight:700;color:#042030;
+}
+.sidebar a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  margin-bottom:8px;
+  border-radius:10px;
+  color:#dbe8ff;text-decoration:none;
+  transition:0.2s;
+}
+.sidebar a:hover{
+  background:var(--hover);
+  color:#fff;
+}
+
+/* Delete link style */
+.sidebar a.danger-link{
+  color:#ffb3b3;
+}
+.sidebar a.danger-link:hover{
+  background: rgba(244,67,54,0.18);
+  color:#fff;
+}
+
+/* small pill tags */
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.04);
+  color:#dbe8ff;
+  font-size:12px;
+}
+
+/* Main content */
+.main{
+  flex:1;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* Panels */
+.panel{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 20px 50px rgba(2,6,23,0.55);
+}
+
+/* Stats cards */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+.stats-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+}
+.stats-card h5{margin:0;color:#fff;}
+.stats-card p{margin:4px 0 0;color:#dbe8ff99;font-size:13px;}
+
+/* Course list */
+.course-list{
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+  gap:12px;
+}
+.course-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.course-card:hover{
+  transform: translateY(-4px);
+  box-shadow:0 12px 28px rgba(2,6,23,0.55);
+}
+.course-card .title{font-weight:700;color:#fff;}
+.course-card .info{font-size:13px;color:#dbe8ff99;}
+.course-card .badge{
+  padding:2px 8px;
+  border-radius:8px;
+  font-size:12px;
+  color:#fff;
+  font-weight:600;
+}
+.badge-green{background:var(--green);}
+.badge-orange{background:var(--orange);}
+.badge-red{background:var(--red);}
+
+/* Footer */
+footer{
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--glass-border);
+  padding:16px 20px;
+  text-align:center;
+  color:#dbe8ffaa;
+  font-size:14px;
+  margin-top:auto;
+}
+
+/* Responsive */
+@media(max-width:900px){
+  .dashboard{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}
+  .sidebar a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span>Hello, {{ request.user.username }} (Student)</span>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</nav>
+
+<!-- Dashboard -->
+<div class="dashboard">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong>{{ request.user.username }}</strong>
+        <div style="font-size:13px;color:#dbe8ff99">Student</div>
+      </div>
+    </div>
+
+    <a href="#"><i class="bi bi-house"></i> Dashboard</a>
+
+    <a href="{% url 'student_profile' %}"><i class="bi bi-person-badge"></i> Create / Edit Profile</a>
+
+    {% if student_profile %}
+      <a href="{% url 'student_profile_view' %}"><i class="bi bi-eye"></i> View Profile</a>
+      <a class="danger-link" href="{% url 'student_profile_delete' %}">
+        <i class="bi bi-trash3"></i> Delete Profile
+      </a>
+    {% endif %}
+
+    <a href="{% url 'student_assessment' %}">
+      <i class="bi bi-clipboard-check"></i> Take Assessment
+    </a>
+
+    <a href="/student_career/">
+      <i class="bi bi-compass"></i> Career & Courses
+    </a>
+
+    <!-- ✅ NEW: Jobs & Internships -->
+    <a href="/student_jobs/">
+      <i class="bi bi-search"></i> Jobs & Internships
+    </a>
+
+    <!-- ✅ AI Counselor -->
+    <a href="{% url 'ai_counselor' %}">
+      <i class="bi bi-robot"></i> AI Counselor
+    </a>
+
+    <a href="#"><i class="bi bi-journal-text"></i> My Courses</a>
+    <a href="#"><i class="bi bi-calendar2-event"></i> Schedule</a>
+    <a href="#"><i class="bi bi-clipboard-check"></i> Assignments</a>
+    <a href="#"><i class="bi bi-bar-chart-line"></i> Reports</a>
+    <a href="#"><i class="bi bi-bell"></i> Notifications</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} mb-0">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stats-card"><h5>5</h5><p>Upcoming Sessions</p></div>
+      <div class="stats-card"><h5>12</h5><p>Completed Sessions</p></div>
+      <div class="stats-card"><h5>3</h5><p>Pending Assignments</p></div>
+      <div class="stats-card"><h5>2</h5><p>Reports</p></div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="panel">
+      <h5>Quick Actions</h5>
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <a href="{% url 'student_assessment' %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-clipboard-check"></i> Take Assessment
+        </a>
+
+        <a href="/student_career/" class="btn btn-success btn-sm">
+          <i class="bi bi-compass"></i> Career & Courses
+        </a>
+
+        <!-- ✅ NEW: Jobs & Internships button -->
+        <a href="/student_jobs/" class="btn btn-warning btn-sm">
+          <i class="bi bi-search"></i> Jobs & Internships
+        </a>
+
+        <a href="{% url 'ai_counselor' %}" class="btn btn-info btn-sm">
+          <i class="bi bi-robot"></i> AI Counselor
+        </a>
+
+        <button class="btn btn-primary btn-sm">Join Session</button>
+        <button class="btn btn-primary btn-sm">Submit Assignment</button>
+        <button class="btn btn-outline-light btn-sm">View Reports</button>
+        <button class="btn btn-outline-light btn-sm">Notifications</button>
+      </div>
+    </div>
+
+    <!-- Career Panel -->
+    <div class="panel">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="mb-1">AI Career & Course Recommendations</h5>
+          <div style="color:#dbe8ff99;font-size:13px;">
+            Personalized suggestions based on your profile + latest assessment score.
+          </div>
+
+          {% if last_attempt %}
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <span class="pill"><i class="bi bi-check2-circle"></i> Ready</span>
+              <span class="pill"><i class="bi bi-book"></i> {{ last_attempt.subject|default:"Subject" }}</span>
+              <span class="pill"><i class="bi bi-award"></i> {{ last_attempt.score }}/{{ last_attempt.total }}</span>
+            </div>
+          {% else %}
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <span class="pill"><i class="bi bi-info-circle"></i> Complete 1 assessment to unlock</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="/student_career/" class="btn btn-success btn-sm">
+            <i class="bi bi-compass"></i> Open Recommendations
+          </a>
+          <a href="{% url 'student_assessment' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-clipboard-check"></i> Take Assessment
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ NEW: Jobs & Internships Panel -->
+    <div class="panel">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="mb-1">Search Jobs & Internships</h5>
+          <div style="color:#dbe8ff99;font-size:13px;">
+            Gemini will analyze your profile skills and suggest best matching job & internship roles with apply links.
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <span class="pill"><i class="bi bi-lightning-charge"></i> Skill-based</span>
+            <span class="pill"><i class="bi bi-briefcase"></i> Jobs</span>
+            <span class="pill"><i class="bi bi-mortarboard"></i> Internships</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="/student_jobs/" class="btn btn-warning btn-sm">
+            <i class="bi bi-search"></i> Open Jobs & Internships
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile status card -->
+    <div class="panel">
+      <h5>Profile Status</h5>
+      {% if student_profile %}
+        <p class="mb-0 text-light">
+          ✅ Profile Created for <b>{{ student_profile.full_name }}</b> —
+          <a class="text-info" href="{% url 'student_profile_view' %}">View Profile</a>
+          &nbsp;|&nbsp;
+          <a class="text-danger" href="{% url 'student_profile_delete' %}">Delete</a>
+        </p>
+      {% else %}
+        <p class="mb-0 text-light">
+          ⚠️ Profile not created yet —
+          <a class="text-info" href="{% url 'student_profile' %}">Create Profile</a>
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- My Courses -->
+    <div class="panel">
+      <h5>My Courses</h5>
+      <div class="course-list mt-2">
+        <div class="course-card">
+          <div class="title">AI Career Counseling <span class="badge badge-green">Active</span></div>
+          <div class="info">Next Session: 11:00 AM — Mock Interview</div>
+        </div>
+        <div class="course-card">
+          <div class="title">Resume Building <span class="badge badge-orange">Pending</span></div>
+          <div class="info">Next Session: 2:00 PM — Resume Review</div>
+        </div>
+        <div class="course-card">
+          <div class="title">Career Strategy <span class="badge badge-green">Active</span></div>
+          <div class="info">Next Session: 4:00 PM — Counseling</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  AI CareerWise — Smart AI Counseling Platform © 2025
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
