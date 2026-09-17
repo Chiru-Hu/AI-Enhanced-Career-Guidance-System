@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>View Profile — AI CareerWise</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+  /* Theme Palette */
+  --bg-light: #f8fafc;
+  --card-bg: #ffffff;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  
+  /* Text Colors */
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --link-color: #6366f1;
+}
+
+/* ===== GLOBAL & BODY ===== */
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-light);
+  /* Subtle mesh gradient background */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* ===== MAIN CARD ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  padding: 2rem !important;
+}
+
+/* ===== DATA LABELS & VALUES ===== */
+.label {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.value {
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Custom link style for profile URLs */
+.text-info {
+  color: var(--link-color) !important;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.text-info:hover {
+  border-bottom: 1px solid var(--link-color);
+  opacity: 0.8;
+}
+
+/* ===== DIVIDERS ===== */
+hr {
+  border-color: var(--border-color) !important;
+  opacity: 1;
+  margin: 1.5rem 0;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  background: var(--primary-gradient) !important;
+  border: none !important;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-outline-light {
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-weight: 600;
+}
+
+.btn-outline-light:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ===== HEADERS ===== */
+h3, .text-white {
+  color: #0f172a !important;
+  font-weight: 800;
+}
+
+/* ===== ALERT BOXES ===== */
+.alert {
+  border-radius: 14px;
+  font-weight: 500;
+}
+</style>
+</head>
+
+<body class="py-4">
+<div class="container">
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="text-white mb-0"><i class="bi bi-eye"></i> View Profile</h3>
+    <div class="d-flex gap-2">
+      <a href="{% url 'student_profile' %}" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+      <a href="{% url 'student_dashboard' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-house"></i> Dashboard</a>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="label">Full Name</div>
+        <div class="value">{{ profile.full_name }}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="label">Email</div>
+        <div class="value">{{ profile.email }}</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="label">Phone</div>
+        <div class="value">{{ profile.phone }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="label">DOB</div>
+        <div class="value">{{ profile.dob }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="label">Gender</div>
+        <div class="value">{{ profile.gender }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">City</div>
+        <div class="value">{{ profile.city }}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="label">State</div>
+        <div class="value">{{ profile.state }}</div>
+      </div>
+
+      <hr class="my-2">
+
+      <div class="col-md-4">
+        <div class="label">Highest Education</div>
+        <div class="value">{{ profile.highest_education }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="label">Degree</div>
+        <div class="value">{{ profile.degree }}</div>
+      </div>
+      <div class="col-md-4">
+        <div class="label">Branch</div>
+        <div class="value">{{ profile.branch }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">College</div>
+        <div class="value">{{ profile.college }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="label">Year</div>
+        <div class="value">{{ profile.year_of_study }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="label">CGPA / %</div>
+        <div class="value">{{ profile.cgpa_or_percent }}</div>
+      </div>
+
+      <hr class="my-2">
+
+      <div class="col-md-6">
+        <div class="label">Skills</div>
+        <div class="value">{% if profile.skills %}{{ profile.skills|join:", " }}{% endif %}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="label">Interests</div>
+        <div class="value">{% if profile.interests %}{{ profile.interests|join:", " }}{% endif %}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">Career Goal</div>
+        <div class="value">{{ profile.career_goal }}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="label">Preferred Roles</div>
+        <div class="value">{{ profile.preferred_roles }}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">LinkedIn</div>
+        <div class="value">{% if profile.linkedin_url %}<a class="text-info" href="{{ profile.linkedin_url }}" target="_blank">{{ profile.linkedin_url }}</a>{% endif %}</div>
+      </div>
+      <div class="col-md-6">
+        <div class="label">GitHub</div>
+        <div class="value">{% if profile.github_url %}<a class="text-info" href="{{ profile.github_url }}" target="_blank">{{ profile.github_url }}</a>{% endif %}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">Resume</div>
+        <div class="value">{% if profile.resume %}<a class="text-info" href="{{ profile.resume.url }}" target="_blank">View Resume</a>{% endif %}</div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="label">Photo</div>
+        <div class="value">{% if profile.photo %}<a class="text-info" href="{{ profile.photo.url }}" target="_blank">View Photo</a>{% endif %}</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

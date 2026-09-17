@@ -1,0 +1,455 @@
+<!-- templates/student_career_report.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Report — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root {
+  /* Theme Palette */
+  --bg-light: #f8fafc;
+  --card-bg: #ffffff;
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  
+  /* Action Colors */
+  --linkedin: #0077b5;
+  --success-green: #22c55e;
+  --warning-orange: #f59e0b;
+  
+  /* Text Colors */
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+}
+
+/* ===== BODY ===== */
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-light);
+  /* Subtle mesh gradient background */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+}
+.navbar-brand {
+  color: #1e1b4b !important;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ===== MAIN CARD ===== */
+.card-glass {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== INNER BOX ===== */
+.box {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: 0.3s ease;
+}
+
+.box:hover {
+  transform: translateY(-4px);
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== PILLS / TAGS ===== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  font-size: 13px;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+/* ===== BADGES (Fit Score) ===== */
+.badge.bg-success {
+  background-color: #f0fdf4 !important;
+  color: #16a34a !important;
+  border: 1px solid #dcfce7;
+  font-weight: 600;
+}
+
+/* ===== BUTTONS & LINK BUTTONS ===== */
+.btn-primary {
+  background: var(--primary-gradient) !important;
+  border: none !important;
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(99, 102, 241, 0.25);
+}
+
+.link-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-outline-info {
+  border-color: #dbeafe;
+  background: #eff6ff;
+  color: var(--linkedin);
+}
+.btn-outline-info:hover {
+  background: var(--linkedin);
+  color: #fff;
+}
+
+.btn-outline-warning {
+  border-color: #fef3c7;
+  background: #fffbeb;
+  color: #d97706;
+}
+.btn-outline-warning:hover {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.btn-outline-success {
+  border-color: #dcfce7;
+  background: #f0fdf4;
+  color: #16a34a;
+}
+.btn-outline-success:hover {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btn-outline-light {
+  border-color: #e2e8f0;
+  color: var(--text-main);
+  background: #fff;
+}
+.btn-outline-light:hover {
+  background: #f1f5f9;
+  color: #000;
+}
+
+/* ===== TEXT ===== */
+h3, h5, h6, .text-white {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.small-muted {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.text-white.fw-bold {
+  color: #1e293b !important;
+}
+
+.hr-soft {
+  border-color: #e2e8f0 !important;
+  opacity: 1;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+@media print {
+  .navbar, .btn, .alert { display: none !important; }
+  body { background: #fff !important; }
+  .card-glass, .box { box-shadow: none !important; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand text-white fw-bold" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <a href="{% url 'student_dashboard' %}" class="btn btn-outline-light btn-sm"><i class="bi bi-house"></i> Dashboard</a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-warning btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width:1100px;">
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="card-glass p-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h3 class="text-white mb-1"><i class="bi bi-compass"></i> Career & Course Recommendations</h3>
+
+        <div class="small-muted">
+          Subject: <b class="text-white">{{ attempt.subject|default:"-" }}</b>
+          • Score: <b class="text-white">{{ attempt.score }}/{{ attempt.total }}</b>
+        </div>
+
+        <div class="small-muted mt-1">
+          Model: <b class="text-white">{{ model_used|default:"-" }}</b>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          {% if report.aptitude_level %}
+            <span class="pill"><i class="bi bi-bar-chart"></i> Aptitude: {{ report.aptitude_level }}</span>
+          {% endif %}
+          {% if profile and profile.city %}
+            <span class="pill"><i class="bi bi-geo-alt"></i> {{ profile.city }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
+          <i class="bi bi-file-earmark-pdf"></i> Save / Print PDF
+        </button>
+        <a class="btn btn-outline-light btn-sm" href="{% url 'student_assessment_result' attempt.id %}">
+          <i class="bi bi-arrow-left"></i> Back to Result
+        </a>
+      </div>
+    </div>
+
+    <hr class="hr-soft my-3">
+
+    <!-- Summary -->
+    <div class="box">
+      <h5 class="text-white mb-1"><i class="bi bi-lightbulb"></i> Summary</h5>
+      <div class="small-muted">{{ report.summary|default:"-" }}</div>
+    </div>
+
+    <!-- Strengths + Improvement -->
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2"><i class="bi bi-check2-circle"></i> Strengths</h6>
+          {% if report.strengths %}
+            <ul class="mb-0">
+              {% for s in report.strengths %}
+                <li class="small-muted">{{ s }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="small-muted">Not available</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="box">
+          <h6 class="text-white mb-2"><i class="bi bi-tools"></i> Improvement Areas</h6>
+          {% if report.improvement_areas %}
+            <ul class="mb-0">
+              {% for s in report.improvement_areas %}
+                <li class="small-muted">{{ s }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="small-muted">Not available</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Career Paths -->
+    <div class="box mt-3">
+      <h5 class="text-white mb-2"><i class="bi bi-briefcase"></i> Top Career Paths</h5>
+
+      <div class="row g-3">
+        {% for c in report.top_career_paths %}
+          <div class="col-md-6">
+            <div class="box h-100">
+              <div class="d-flex justify-content-between align-items-center gap-2">
+                <h6 class="text-white mb-0">{{ c.career|default:"Career" }}</h6>
+                {% if c.fit_score %}
+                  <span class="badge bg-success">Fit {{ c.fit_score }}%</span>
+                {% endif %}
+              </div>
+
+              <div class="small-muted mt-2">{{ c.why_fit|default:"" }}</div>
+
+              <div class="mt-2 small-muted"><b class="text-white">Roles:</b>
+                {% if c.roles %}{{ c.roles|join:", " }}{% else %}-{% endif %}
+              </div>
+
+              <div class="mt-1 small-muted"><b class="text-white">Missing skills:</b>
+                {% if c.missing_skills %}{{ c.missing_skills|join:", " }}{% else %}-{% endif %}
+              </div>
+
+              <div class="mt-1 small-muted"><b class="text-white">Projects:</b>
+                {% if c.projects %}{{ c.projects|join:", " }}{% else %}-{% endif %}
+              </div>
+
+              <hr class="hr-soft my-2">
+
+              <!-- ✅ AUTO Job/Apply links based on career + skills -->
+              {% with ms=c.missing_skills|join:" " %}
+                {% with q=c.career|default:""|add:" "|add:attempt.subject|default_if_none:""|add:" "|add:ms %}
+                  <div class="d-flex flex-wrap gap-2 mb-2">
+                    <a class="btn btn-outline-info link-btn" target="_blank"
+                       href="https://www.linkedin.com/jobs/search/?keywords={{ q|urlencode }}">
+                      <i class="bi bi-linkedin"></i> LinkedIn Jobs
+                    </a>
+
+                    <a class="btn btn-outline-warning link-btn" target="_blank"
+                       href="https://www.linkedin.com/jobs/search/?f_AL=true&keywords={{ q|urlencode }}">
+                      <i class="bi bi-send-check"></i> Easy Apply
+                    </a>
+
+                    <a class="btn btn-outline-light link-btn" target="_blank"
+                       href="https://www.indeed.com/jobs?q={{ q|urlencode }}">
+                      <i class="bi bi-globe"></i> Indeed
+                    </a>
+
+                    <a class="btn btn-outline-light link-btn" target="_blank"
+                       href="https://www.naukri.com/{{ c.career|default:'jobs'|urlencode }}-jobs">
+                      <i class="bi bi-search"></i> Naukri
+                    </a>
+
+                    <a class="btn btn-outline-success link-btn" target="_blank"
+                       href="https://internshala.com/internships/keywords-{{ c.career|default:'intern'|urlencode }}/">
+                      <i class="bi bi-mortarboard"></i> Internshala
+                    </a>
+                  </div>
+                {% endwith %}
+              {% endwith %}
+
+              <!-- Roadmap -->
+              {% if c.roadmap_30_60_90 %}
+                <div class="small-muted"><b class="text-white">30 Days:</b>
+                  {% if c.roadmap_30_60_90.days_30 %}{{ c.roadmap_30_60_90.days_30|join:" • " }}{% else %}-{% endif %}
+                </div>
+                <div class="small-muted"><b class="text-white">60 Days:</b>
+                  {% if c.roadmap_30_60_90.days_60 %}{{ c.roadmap_30_60_90.days_60|join:" • " }}{% else %}-{% endif %}
+                </div>
+                <div class="small-muted"><b class="text-white">90 Days:</b>
+                  {% if c.roadmap_30_60_90.days_90 %}{{ c.roadmap_30_60_90.days_90|join:" • " }}{% else %}-{% endif %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="small-muted">No career paths available.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Courses -->
+    <div class="box mt-3">
+      <h5 class="text-white mb-2"><i class="bi bi-journal-bookmark"></i> Course Recommendations</h5>
+
+      <div class="row g-3">
+        {% for c in report.course_recommendations %}
+          <div class="col-md-6">
+            <div class="box h-100">
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="text-white fw-bold">{{ c.title|default:"Course" }}</div>
+                  <div class="small-muted">
+                    {{ c.platform|default:"Platform" }} • {{ c.level|default:"Level" }}
+                    {% if c.duration_weeks %} • {{ c.duration_weeks }} weeks{% endif %}
+                  </div>
+                </div>
+
+                {% with qq=c.search_query|default:c.title %}
+                  <a class="btn btn-outline-info link-btn" target="_blank"
+                     href="https://www.google.com/search?q={{ qq|urlencode }}">
+                    <i class="bi bi-search"></i> Open
+                  </a>
+                {% endwith %}
+              </div>
+
+              <div class="small-muted mt-2">{{ c.why|default:"" }}</div>
+
+              {% with qq=c.search_query|default:c.title %}
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <a class="btn btn-outline-light link-btn" target="_blank"
+                     href="https://www.youtube.com/results?search_query={{ qq|urlencode }}">
+                    <i class="bi bi-youtube"></i> YouTube
+                  </a>
+                  <a class="btn btn-outline-light link-btn" target="_blank"
+                     href="https://www.coursera.org/search?query={{ qq|urlencode }}">
+                    <i class="bi bi-box-arrow-up-right"></i> Coursera
+                  </a>
+                  <a class="btn btn-outline-light link-btn" target="_blank"
+                     href="https://www.udemy.com/courses/search/?q={{ qq|urlencode }}">
+                    <i class="bi bi-box-arrow-up-right"></i> Udemy
+                  </a>
+                </div>
+              {% endwith %}
+
+              {% if c.search_query %}
+                <div class="small-muted mt-2"><b class="text-white">Search:</b> {{ c.search_query }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="small-muted">No courses available.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Next actions -->
+    <div class="box mt-3">
+      <h5 class="text-white mb-2"><i class="bi bi-list-check"></i> Next Actions</h5>
+      {% if report.next_actions %}
+        <ul class="mb-0">
+          {% for a in report.next_actions %}
+            <li class="small-muted">{{ a }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="small-muted">No next actions available.</div>
+      {% endif %}
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap mt-4">
+      <a class="btn btn-primary px-4" href="{% url 'student_dashboard' %}">
+        <i class="bi bi-house"></i> Dashboard
+      </a>
+      <a class="btn btn-outline-light px-4" href="{% url 'student_assessment' %}">
+        <i class="bi bi-arrow-repeat"></i> Take New Assessment
+      </a>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
