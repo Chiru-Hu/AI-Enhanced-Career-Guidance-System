@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Virtual Career Platform — Home</title>
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* -------------------------
+       Variables & Base
+       ------------------------- */
+    :root{
+      --bg1: #06102a;
+      --bg2: #081336;
+      --accent-a: #0d6efd;
+      --accent-b: #6610f2;
+      --gold: #ffd166;
+      --glass: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.09);
+      --text-soft: #dbe8ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100%;
+      color:var(--text-soft);
+      font-family: "Inter", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(102,16,242,0.08), transparent),
+                  linear-gradient(120deg,var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    /* -------------------------
+       Animated blobs (background)
+       ------------------------- */
+    .bg-blobs{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+      filter: blur(36px) saturate(120%);
+      opacity:0.9;
+    }
+    .blob{
+      position:absolute;
+      width:380px;
+      height:380px;
+      border-radius:50%;
+      mix-blend-mode:screen;
+      animation: float 12s ease-in-out infinite;
+      opacity:0.6;
+    }
+    .b1{background:linear-gradient(180deg, rgba(13,110,253,0.9), rgba(102,16,242,0.8)); left:-8%; top:10%; animation-duration:14s;}
+    .b2{background:linear-gradient(180deg, rgba(255,150,50,0.75), rgba(255,214,102,0.6)); right:-6%; top:25%; animation-duration:18s;}
+    .b3{background:linear-gradient(180deg, rgba(0,200,255,0.18), rgba(102,16,242,0.12)); left:18%; bottom:-10%; animation-duration:22s; width:520px;height:520px;}
+    @keyframes float{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.05)}100%{transform:translateY(0) scale(1)}}
+
+    /* -------------------------
+       Navbar
+       ------------------------- */
+    .navbar{
+      position:relative;
+      z-index:20;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid rgba(255,255,255,0.03);
+    }
+    .navbar-brand{font-weight:800;color:#fff}
+    .nav-link{color:rgba(255,255,255,0.9)}
+    .nav-link:hover{color:var(--gold)}
+
+    /* -------------------------
+       Hero Area
+       ------------------------- */
+    .hero{
+      position:relative;
+      z-index:10;
+      padding:5.5rem 1.25rem 3.5rem;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:2rem;
+      align-items:center;
+    }
+    .glass{
+      background: var(--glass);
+      border:1px solid var(--glass-border);
+      border-radius:14px;
+      padding:1.5rem;
+      box-shadow: 0 20px 50px rgba(2,6,23,0.55);
+      backdrop-filter: blur(10px) saturate(110%);
+    }
+    h1.hero-title{
+      color:#fff;
+      font-size:2.2rem;
+      line-height:1.02;
+      margin:0 0 .6rem;
+      letter-spacing:-0.2px;
+    }
+    p.lead{
+      color:var(--text-soft);
+      margin-bottom:1.1rem;
+      font-size:1.02rem;
+    }
+    .btn-primary-cta{
+      background: linear-gradient(90deg,var(--accent-a), var(--accent-b));
+      color:#fff;
+      border:none;
+      padding:.8rem 1.15rem;
+      border-radius:10px;
+      font-weight:700;
+      box-shadow: 0 12px 36px rgba(102,16,242,0.12);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .btn-primary-cta:hover{ transform: translateY(-3px); box-shadow:0 18px 48px rgba(13,110,253,0.16); }
+
+    .btn-ghost{
+      background:transparent;
+      color:var(--text-soft);
+      border:1px solid rgba(255,255,255,0.06);
+      padding:.6rem .9rem;
+      border-radius:10px;
+      font-weight:600;
+    }
+
+    /* -------------------------
+       Role cards w/ tilt
+       ------------------------- */
+    .roles{
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:12px;
+      margin-top:1.25rem;
+    }
+    .role{
+      padding:14px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      text-align:center;
+      cursor:default;
+      transition: transform .16s ease, box-shadow .16s ease;
+      transform-style:preserve-3d;
+    }
+    .role:hover{ transform: translateY(-8px) scale(1.01); box-shadow: 0 20px 40px rgba(2,6,23,0.55);}
+    .role .icon{
+      width:56px;height:56px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.5rem;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      color:var(--gold); font-size:1.35rem;
+    }
+    .role h6{margin:0;font-weight:700;color:#fff;font-size:1rem}
+    .role p{margin:.45rem 0 0;color:rgba(223,233,255,0.85); font-size:.87rem}
+
+    /* -------------------------
+       How it works — SVG flow
+       ------------------------- */
+    .how{
+      margin-top:2.25rem;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .flow-item{
+      flex:1 1 200px;
+      text-align:center;
+      padding:14px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .flow-item h6{margin:0;font-weight:800;font-size:1rem}
+    .flow-item p{margin:.4rem 0 0;color:rgba(223,233,255,0.85);font-size:.9rem}
+
+    /* SVG connectors hidden on small */
+    .connector{
+      flex:0 0 60px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    @media(max-width:880px){ .hero-grid{grid-template-columns: 1fr} .roles{grid-template-columns:repeat(2,1fr)} .connector{display:none} .how{gap:10px} }
+
+    /* -------------------------
+       Features & CTA
+       ------------------------- */
+    .features-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+      margin-top:1.25rem;
+    }
+    .feature{
+      padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .feature i{font-size:1.4rem;color:var(--accent-a)}
+
+    /* -------------------------
+       Testimonials carousel (simple)
+       ------------------------- */
+    .testimonials{margin-top:2rem;}
+    .test-card{
+      padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      text-align:left;
+    }
+    .test-card p{margin:.5rem 0 0; color: rgba(223,233,255,0.95)}
+
+    /* -------------------------
+       Footer
+       ------------------------- */
+    footer{padding:2rem 1rem;margin-top:3rem;color:rgba(223,233,255,0.85)}
+
+    /* small screens tweaks */
+    @media(max-width:600px){
+      h1.hero-title{font-size:1.5rem}
+      .roles{grid-template-columns:1fr}
+      .hero{padding-top:3.8rem}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Blobs -->
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob b1" style="left:-10%; top:6%;"></div>
+    <div class="blob b2" style="right:-8%; top:22%;"></div>
+    <div class="blob b3" style="left:12%; bottom:-10%;"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="navbar navbar-expand-lg py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#">AI CareerWise</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+        <span class="navbar-toggler-icon bg-light rounded p-1"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navmenu">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="#roles">Roles</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about/">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="/admin_login/">Admin Login</a></li>
+          <li class="nav-item ms-2"><a class="btn btn-outline-light btn-sm" href="/login">Login</a></li>
+          <li class="nav-item ms-2"><a class="btn btn-primary-cta" href="/register/">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="glass" data-aos="fade-right">
+          <h1 class="hero-title">Smart AI career guidance for students — built for parents, counselors & admins.</h1>
+          <p class="lead">Personalized assessments (aptitude, interest, personality), AI-chat counseling, curated career & course recommendations, and collaboration tools for parents and counselors.</p>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-primary-cta" href="/register">Get Started — Free</a>
+            <a class="btn btn-ghost" href="#how">How it works</a>
+          </div>
+
+          <!-- Roles -->
+          <div class="roles" id="roles">
+            <div class="role" data-role="tilt">
+              <div class="icon"><i class="bi bi-person-circle"></i></div>
+              <h6>Student</h6>
+              <p>Create profile, take adaptive assessments, get tailored career & course suggestions.</p>
+            </div>
+
+            <div class="role" data-role="tilt">
+              <div class="icon"><i class="bi bi-people"></i></div>
+              <h6>Parent</h6>
+              <p>Monitor your child’s progress and view assessment reports & recommendations.</p>
+            </div>
+
+            <div class="role" data-role="tilt">
+              <div class="icon"><i class="bi bi-person-badge"></i></div>
+              <h6>Counselor</h6>
+              <p>Review student dashboards, add notes & provide personalized counseling.</p>
+            </div>
+
+            <div class="role" data-role="tilt">
+              <div class="icon"><i class="bi bi-shield-lock"></i></div>
+              <h6>Admin</h6>
+              <p>Manage platform data, approvals, and generate analytics & exportable reports.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Flow panel -->
+        <aside class="glass" data-aos="fade-left">
+          <h5 style="margin:0 0 .6rem">Quick Flow</h5>
+
+          <div class="how" aria-hidden="true">
+            <div class="flow-item">
+              <h6>Register / Login</h6>
+              <p>Student / Parent / Counselor accounts</p>
+            </div>
+
+            <div class="connector" aria-hidden="true">
+              <!-- tiny animated arrow -->
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 24h36" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M30 14l10 10-10 10" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="flow-item">
+              <h6>Take Assessments</h6>
+              <p>Interest, Aptitude & Personality tests</p>
+            </div>
+
+            <div class="connector" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 24h36" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M30 14l10 10-10 10" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="flow-item">
+              <h6>AI Recommendations</h6>
+              <p>Ranked careers, suggested courses & internships</p>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;text-align:center">
+            <a class="btn btn-outline-light" href="/login">Open Demo</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOW IT WORKS + FEATURES -->
+  <main class="container pb-5" id="how">
+    <div class="row g-4">
+      <div class="col-lg-7" data-aos="fade-up">
+        <div class="glass p-4">
+          <h3 style="margin:0 0 .6rem">How the AI Virtual Career Platform Works</h3>
+          <p style="color:var(--text-soft)">Create a profile, complete adaptive assessments, receive AI-backed career & course recommendations, chat with an AI counselor for practical guidance (resume, internships, courses), and let parents & counselors collaborate on the student's progress.</p>
+
+          <div class="features-grid mt-3">
+            <div class="feature">
+              <i class="bi bi-robot"></i>
+              <h6 style="margin-top:.5rem">Adaptive AI Assessments</h6>
+              <p style="margin:6px 0 0; color:rgba(223,233,255,0.9)">Questions adapt based on responses to create accurate profiles.</p>
+            </div>
+
+            <div class="feature">
+              <i class="bi bi-chat-dots"></i>
+              <h6 style="margin-top:.5rem">AI Chat Counselor</h6>
+              <p style="margin:6px 0 0; color:rgba(223,233,255,0.9)">Ask step-by-step questions and get actionable advice.</p>
+            </div>
+
+            <div class="feature">
+              <i class="bi bi-people-fill"></i>
+              <h6 style="margin-top:.5rem">Parent & Counselor Portal</h6>
+              <p style="margin:6px 0 0; color:rgba(223,233,255,0.9)">Share reports and plan next steps collaboratively.</p>
+            </div>
+
+            <div class="feature">
+              <i class="bi bi-bar-chart-line"></i>
+              <h6 style="margin-top:.5rem">Reports & Analytics</h6>
+              <p style="margin:6px 0 0; color:rgba(223,233,255,0.9)">Exportable insights to guide educational decisions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5" data-aos="fade-left">
+        <div class="glass p-3">
+          <h5 style="margin:0 0 .5rem">Student Journey</h5>
+          <ol style="color:var(--text-soft); margin:.5rem 0 0 1rem;">
+            <li>Create profile & fill background</li>
+            <li>Take adaptive interest, aptitude & personality tests</li>
+            <li>Get ranked career matches & suggested courses</li>
+            <li>Use AI chat for resume, internships & next steps</li>
+            <li>Parents/counselors review & provide guidance</li>
+          </ol>
+          <div style="margin-top:1rem">
+            <a class="btn btn-primary-cta" href="/register">Start Assessment</a>
+          </div>
+        </div>
+
+        <div class="testimonials mt-3">
+          <div class="test-card p-3" data-index="0">
+            <strong>“Helped my daughter discover a clear path.”</strong>
+            <p>Parent — “The report was detailed and made college choices easier.”</p>
+          </div>
+          <div class="test-card p-3 d-none" data-index="1">
+            <strong>“Practical AI guidance on internships.”</strong>
+            <p>Student — “Resume tips and interview prep helped me land an internship.”</p>
+          </div>
+          <div class="test-card p-3 d-none" data-index="2">
+            <strong>“Admin tools are powerful.”strong>
+            <p>Admin — “Easy reporting & export saved time for our team.”p>
+          </div>
+          <div class="mt-2 d-flex gap-2">
+            <button id="prevTest" class="btn btn-ghost btn-sm"><i class="bi bi-chevron-left"></i></button>
+            <button id="nextTest" class="btn btn-ghost btn-sm"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA strip -->
+    <div class="cta-strip glass mt-4 d-flex align-items-center justify-content-between" style="gap:12px">
+      <div>
+        <h5 style="margin:0">Ready to help students choose with confidence?</h5>
+        <p style="margin:0;color:var(--text-soft)">Get accurate career suggestions and make informed decisions with AI support.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-primary-cta" href="/register">Create Account</a>
+        <a class="btn btn-ghost" href="/about">Learn More</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <strong>AI CareerWise</strong>
+          <div style="margin-top:.3rem;color:var(--text-soft)">AI-driven career counseling — trusted by schools and families.</div>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+          <a class="text-decoration-none me-2" href="#"><i class="bi bi-facebook" style="color:var(--text-soft)"></i></a>
+          <a class="text-decoration-none me-2" href="#"><i class="bi bi-twitter" style="color:var(--text-soft)"></i></a>
+          <a class="text-decoration-none me-2" href="#"><i class="bi bi-instagram" style="color:var(--text-soft)"></i></a>
+          <div style="margin-top:.6rem;color:rgba(223,233,255,0.8)">© 2025 AI CareerWise — All rights reserved</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tiny AOS-like fade-up fallback (small and dependency-free)
+    document.querySelectorAll('[data-aos]').forEach(el=>{
+      // simple appear-on-view
+      const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){ el.style.transition='transform .7s ease, opacity .7s ease'; el.style.opacity=1; el.style.transform='none'; obs.unobserve(el); }
+        });
+      }, {threshold:.12});
+      el.style.opacity=0; el.style.transform='translateY(18px)';
+      obs.observe(el);
+    });
+
+    // Simple testimonials carousel
+    (function(){
+      const cards = document.querySelectorAll('.test-card');
+      let idx = 0;
+      const show = (i)=>{
+        cards.forEach(c=>c.classList.add('d-none'));
+        if(cards[i]) cards[i].classList.remove('d-none');
+      }
+      document.getElementById('prevTest').addEventListener('click', ()=>{ idx = (idx-1+cards.length)%cards.length; show(idx); });
+      document.getElementById('nextTest').addEventListener('click', ()=>{ idx = (idx+1)%cards.length; show(idx); });
+      show(0);
+    })();
+
+    // 3D Tilt for role cards (small effect)
+    (function(){
+      const tilts = document.querySelectorAll('[data-role="tilt"]');
+      tilts.forEach(card=>{
+        card.addEventListener('mousemove', (e)=>{
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width;
+          const y = (e.clientY - rect.top) / rect.height;
+          const rx = (y - 0.5) * 6; // rotateX
+          const ry = (x - 0.5) * -10; // rotateY
+          card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+        });
+        card.addEventListener('mouseleave', ()=>{ card.style.transform='translateY(0)'; });
+      });
+    })();
+  </script>
+</body>
+</html>

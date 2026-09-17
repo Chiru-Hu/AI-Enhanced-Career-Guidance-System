@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard — AI CareerWise</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root{
+  /* Core palette */
+  --bg1:#050b1e; --bg2:#071a33;
+  --glass:rgba(255,255,255,0.10);
+  --glass2:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.14);
+  --text:#eaf1ff; --muted:rgba(234,241,255,0.72);
+
+  --brand:#4aa3ff;
+  --mint:#20c997;
+  --warn:#ffcc66;
+
+  --hover:rgba(74,163,255,0.16);
+  --shadow: 0 22px 70px rgba(0,0,0,0.45);
+  --radius: 18px;
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+
+  /* premium background */
+  background:
+    radial-gradient(900px 520px at 14% 10%, rgba(74,163,255,.25), transparent 60%),
+    radial-gradient(900px 520px at 88% 92%, rgba(32,201,151,.20), transparent 60%),
+    linear-gradient(160deg,var(--bg1),var(--bg2));
+}
+
+/* subtle star/noise pattern */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+  background-size: 24px 24px;
+  opacity: .20;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-blobs::before,
+.bg-blobs::after{
+  content:"";
+  position:fixed;
+  width:560px;height:560px;
+  filter: blur(48px);
+  opacity:.28;
+  z-index:0;
+  animation: floaty 11s ease-in-out infinite;
+}
+.bg-blobs::before{
+  left:-220px; top:-190px;
+  background: radial-gradient(circle at 30% 30%, #0d6efd, transparent 60%);
+}
+.bg-blobs::after{
+  right:-260px; bottom:-230px;
+  background: radial-gradient(circle at 40% 40%, #20c997, transparent 60%);
+  animation-duration: 13s;
+}
+@keyframes floaty{
+  0%,100%{ transform: translate(0,0) scale(1); }
+  50%{ transform: translate(18px, -22px) scale(1.03); }
+}
+
+/* Navbar (sticky + premium) */
+.navbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(14px);
+  border-bottom:1px solid var(--border);
+  box-shadow: 0 18px 50px rgba(0,0,0,.22);
+}
+
+/* Glass card base */
+.card-glass{
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+.card-glass::after{
+  content:"";
+  position:absolute;
+  inset: -80px -80px auto auto;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle at 30% 30%, rgba(74,163,255,.25), transparent 65%);
+  transform: rotate(12deg);
+  pointer-events:none;
+}
+
+.box{
+  background: var(--glass2);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.small-muted{ color:var(--muted); font-size:13px; }
+
+.pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 12px; border-radius:999px;
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);
+  font-size:12px;
+  color: var(--muted);
+}
+
+.fade-in{ animation: fadeIn .35s ease both; }
+@keyframes fadeIn{
+  from{ opacity:0; transform: translateY(10px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+/* Search */
+.search-input{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: var(--text);
+  border-radius: 14px;
+  min-width: 340px;
+}
+.search-input::placeholder{ color: rgba(234,241,255,.55); }
+.search-input:focus{
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+  border-color: rgba(74,163,255,0.70);
+  box-shadow: 0 0 0 .2rem rgba(74,163,255,.14);
+}
+
+/* Buttons */
+.btn-soft{
+  border:1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 14px;
+}
+.btn-soft:hover{
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.28);
+  color: var(--text);
+}
+
+.btn-warn{
+  border-radius: 14px;
+  border: 1px solid rgba(255,204,102,.55);
+  background: rgba(255,204,102,.14);
+  color: #ffe9b3;
+}
+.btn-warn:hover{
+  background: rgba(255,204,102,.20);
+  color: #fff1c7;
+}
+
+/* Summary cards better */
+.kpi{
+  height: 100%;
+  padding: 16px;
+}
+.kpi-top{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.kpi-icon{
+  width: 44px; height: 44px;
+  border-radius: 16px;
+  display:grid; place-items:center;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.kpi .value{
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.kpi .label{ color: var(--muted); font-size: 13px; }
+.kpi .hint{ color: rgba(234,241,255,.62); font-size: 12px; }
+
+/* Tabs */
+.tab-btn{
+  border:1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px 14px;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.tab-btn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.09);
+}
+.tab-btn.active{
+  background: rgba(74,163,255,0.20);
+  border-color: rgba(74,163,255,0.55);
+  box-shadow: 0 0 0 .2rem rgba(74,163,255,.10) inset;
+}
+
+/* Table: make it a “light card” for perfect readability */
+.table-surface{
+  background: rgba(255,255,255,0.92);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 18px 55px rgba(0,0,0,.25);
+}
+.table{
+  color: #101828 !important;
+  margin: 0;
+}
+.table thead th{
+  background: rgba(16,24,40,.96);
+  color: #fff !important;
+  border-color: rgba(255,255,255,.14);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .2px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.table tbody td{
+  color:#101828 !important;
+  border-color: rgba(16,24,40,0.10);
+}
+.table-hover tbody tr:hover{
+  background: rgba(74,163,255,0.10);
+}
+
+/* your existing “text-white inside table” fix */
+.table .text-white{ color:#101828 !important; }
+.table .small-muted{ color:#475467 !important; } /* nicer gray */
+
+/* Progress */
+.progress{
+  height:10px;
+  background: rgba(16,24,40,0.12);
+  border-radius: 999px;
+  overflow:hidden;
+}
+.progress-bar{
+  border-radius: 999px;
+}
+
+/* Alerts */
+.alert{
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+  box-shadow: 0 18px 55px rgba(0,0,0,.25);
+}
+
+/* Responsive */
+@media (max-width: 992px){
+  .search-input{ min-width: 0; width: 100%; }
+}
+</style>
+</head>
+
+<body class="bg-blobs">
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <div class="d-flex align-items-center gap-2">
+    <i class="bi bi-shield-lock fs-4" style="color:var(--warn)"></i>
+    <a class="navbar-brand text-white fw-bold m-0" href="#">AI CareerWise</a>
+    <span class="pill"><i class="bi bi-person-check"></i> Admin Panel</span>
+  </div>
+
+  <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
+    <form class="d-flex" method="get" action="{% url 'admin_dashboard' %}">
+      <input class="form-control search-input me-2" name="q" value="{{ q }}" placeholder="Search name, username, email, degree..." />
+      <button class="btn btn-soft" type="submit" title="Search"><i class="bi bi-search"></i></button>
+    </form>
+    <a href="{% url 'admin_logout' %}" class="btn btn-warn">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width: 1250px; position:relative; z-index:1;">
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }} fade-in">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Summary Cards -->
+  <div class="row g-3 fade-in">
+    <div class="col-md-3">
+      <div class="card-glass kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="label">Students</div>
+            <div class="value text-white">{{ total_students }}</div>
+            <div class="hint">All registered student profiles</div>
+          </div>
+          <div class="kpi-icon"><i class="bi bi-mortarboard fs-4" style="color:var(--brand)"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card-glass kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="label">Parents</div>
+            <div class="value text-white">{{ total_parents }}</div>
+            <div class="hint">Parent accounts / profiles</div>
+          </div>
+          <div class="kpi-icon"><i class="bi bi-people fs-4" style="color:var(--mint)"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card-glass kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="label">Counselors</div>
+            <div class="value text-white">{{ total_counselors }}</div>
+            <div class="hint">Counselor accounts</div>
+          </div>
+          <div class="kpi-icon"><i class="bi bi-person-workspace fs-4" style="color:#9aa7ff"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card-glass kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="label">Completed Assessments</div>
+            <div class="value text-white">{{ total_completed_assessments }}</div>
+            <div class="hint">Submitted attempts</div>
+          </div>
+          <div class="kpi-icon"><i class="bi bi-clipboard-check fs-4" style="color:var(--warn)"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card-glass p-3 mt-3 fade-in">
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn tab-btn active" data-tab="tabStudents"><i class="bi bi-mortarboard"></i> Students</button>
+      <button class="btn tab-btn" data-tab="tabParents"><i class="bi bi-people"></i> Parents</button>
+      <button class="btn tab-btn" data-tab="tabCounselors"><i class="bi bi-person-workspace"></i> Counselors</button>
+    </div>
+  </div>
+
+  <!-- STUDENTS TAB -->
+  <div id="tabStudents" class="card-glass p-3 mt-3 fade-in">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+      <div>
+        <h5 class="text-white mb-1"><i class="bi bi-mortarboard"></i> Students</h5>
+        <div class="small-muted">Full student profile + latest assessment snapshot.</div>
+      </div>
+    </div>
+
+    <div class="table-responsive table-surface">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Full Name</th>
+            <th>Education</th>
+            <th>Skills / Interests</th>
+            <th>Latest Assessment</th>
+            <th style="min-width:180px;">Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in student_rows %}
+          <tr>
+            <td>
+              <div class="fw-bold text-white">{{ s.username }}</div>
+              <div class="small-muted">{{ s.email|default:"-" }}</div>
+              <div class="small-muted">{{ s.phone|default:"-" }}</div>
+            </td>
+            <td>
+              <div class="fw-bold text-white">{{ s.full_name }}</div>
+              <div class="small-muted">{{ s.city|default:"-" }}, {{ s.state|default:"-" }}</div>
+            </td>
+            <td>
+              <div class="small-muted"><b class="text-white">Degree:</b> {{ s.degree|default:"-" }}</div>
+              <div class="small-muted"><b class="text-white">Branch:</b> {{ s.branch|default:"-" }}</div>
+              <div class="small-muted"><b class="text-white">Year:</b> {{ s.year|default:"-" }}</div>
+            </td>
+            <td>
+              <div class="small-muted"><b class="text-white">Skills:</b> {{ s.skills|join:", "|default:"-" }}</div>
+              <div class="small-muted"><b class="text-white">Interests:</b> {{ s.interests|join:", "|default:"-" }}</div>
+            </td>
+            <td>
+              <div class="small-muted"><b class="text-white">Subject:</b> {{ s.subject }}</div>
+              <div class="small-muted"><b class="text-white">Score:</b> {{ s.score }}</div>
+              <div class="small-muted">
+                <b class="text-white">Career Report:</b>
+                {% if s.has_career_report %}<span class="text-success">Yes</span>{% else %}<span class="text-warning">No</span>{% endif %}
+              </div>
+            </td>
+            <td>
+              <div class="d-flex justify-content-between small-muted">
+                <span>{{ s.score_pct }}%</span>
+                <span>{{ s.score }}</span>
+              </div>
+              <div class="progress mt-1">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ s.score_pct }}%"></div>
+              </div>
+              <div class="small-muted mt-1">
+                {% if s.completed_at %}Completed: {{ s.completed_at }}{% else %}Not submitted{% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="small-muted p-3">No students found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PARENTS TAB -->
+  <div id="tabParents" class="card-glass p-3 mt-3 fade-in" style="display:none;">
+    <h5 class="text-white mb-1"><i class="bi bi-people"></i> Parents</h5>
+    <div class="small-muted mb-2">Parent details + linked children count.</div>
+
+    <div class="table-responsive table-surface">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Parent Name</th>
+            <th>Contact</th>
+            <th>Children Linked</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in parents_rows %}
+          <tr>
+            <td class="fw-bold text-white">{{ p.username }}</td>
+            <td>
+              <div class="fw-bold text-white">{{ p.full_name }}</div>
+              <div class="small-muted">Relation: {{ p.relation|default:"-" }}</div>
+            </td>
+            <td>
+              <div class="small-muted"><b class="text-white">Email:</b> {{ p.email|default:"-" }}</div>
+              <div class="small-muted"><b class="text-white">Phone:</b> {{ p.phone|default:"-" }}</div>
+            </td>
+            <td>
+              <span class="pill"><i class="bi bi-person-badge"></i> {{ p.children_count }}</span>
+              <div class="small-muted mt-1">
+                {% if p.children_names %}
+                  {{ p.children_names|join:", " }}
+                {% else %}
+                  No children linked
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="small-muted p-3">No parents found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- COUNSELORS TAB -->
+  <div id="tabCounselors" class="card-glass p-3 mt-3 fade-in" style="display:none;">
+    <h5 class="text-white mb-1"><i class="bi bi-person-workspace"></i> Counselors</h5>
+    <div class="small-muted mb-2">All counselor accounts.</div>
+
+    <div class="table-responsive table-surface">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in counselors_rows %}
+          <tr>
+            <td class="fw-bold text-white">{{ c.username }}</td>
+            <td class="small-muted">{{ c.email|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="2" class="small-muted p-3">No counselors found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ✅ Tabs switching (same logic)
+  const btns = document.querySelectorAll(".tab-btn");
+  const tabs = ["tabStudents","tabParents","tabCounselors"];
+  btns.forEach(b=>{
+    b.addEventListener("click", ()=>{
+      btns.forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      const target = b.getAttribute("data-tab");
+      tabs.forEach(t=>{
+        document.getElementById(t).style.display = (t === target) ? "block" : "none";
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+</script>
+
+</body>
+</html>

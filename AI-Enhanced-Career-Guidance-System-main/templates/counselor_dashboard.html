@@ -1,0 +1,174 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counselor Dashboard — AI CareerWise</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--bg:#06102a;--accent:#0d6efd;--glass:rgba(255,255,255,0.06);--glass-border:rgba(255,255,255,0.09);--text:#dbe8ff;--card-bg:rgba(255,255,255,0.02);--card-border:rgba(255,255,255,0.03);--hover:#0d6efd33;}
+body{margin:0;font-family:"Inter",sans-serif;background:linear-gradient(160deg,#06102a,#081336);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.navbar{background:var(--glass);backdrop-filter:blur(10px);border-bottom:1px solid var(--glass-border);}
+.navbar-brand{color:#fff;font-weight:700;}
+.dashboard{display:flex;min-height:calc(100vh - 56px);}
+.sidebar{width:260px;background:var(--glass);backdrop-filter:blur(12px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;padding:20px 12px;}
+.sidebar .profile{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.sidebar .avatar{width:50px;height:50px;background:linear-gradient(135deg,#4dd0e1,#3f51b5);border-radius:12px;display:grid;place-items:center;font-weight:700;color:#042030;}
+.sidebar a{display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:8px;border-radius:10px;color:#dbe8ff;text-decoration:none;transition:0.2s;}
+.sidebar a:hover{background:var(--hover);color:#fff;}
+.main{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;}
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:16px;box-shadow:0 20px 50px rgba(2,6,23,0.55);}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
+.stats-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px;text-align:center;}
+.stats-card h5{margin:0;color:#fff;}
+.stats-card p{margin:4px 0 0;color:#dbe8ff99;font-size:13px;}
+.student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+.student-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px;transition:.2s;}
+.student-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(2,6,23,0.55);}
+.small-muted{color:rgba(219,232,255,0.72);font-size:13px;}
+@media(max-width:900px){.dashboard{flex-direction:column;}.sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}.sidebar a{white-space:nowrap;}}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg py-3 px-3">
+  <a class="navbar-brand" href="#">AI CareerWise</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <span>Hello, {{ request.user.username }} (Counselor)</span>
+    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+  </div>
+</nav>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <div class="profile">
+      <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <strong>{{ request.user.username }}</strong>
+        <div style="font-size:13px;color:#dbe8ff99">Counselor</div>
+      </div>
+    </div>
+    <a class="active" href="{% url 'counselor_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a>
+    <a href="#students"><i class="bi bi-people"></i> Students</a>
+    <a href="#"><i class="bi bi-journal-text"></i> Notes</a>
+    <a href="#"><i class="bi bi-calendar2-event"></i> Schedule</a>
+    <a href="#"><i class="bi bi-bar-chart-line"></i> Reports</a>
+  </aside>
+
+  <main class="main">
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} mb-0">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stats-card">
+        <h5>{{ total_students }}</h5>
+        <p>Total Students</p>
+      </div>
+      <div class="stats-card">
+        <h5>{{ completed_assessments }}</h5>
+        <p>Completed Assessments</p>
+      </div>
+      <div class="stats-card">
+        <h5>{{ reports_ready }}</h5>
+        <p>Career Reports Ready</p>
+      </div>
+      <div class="stats-card">
+        <h5>{{ reports_pending }}</h5>
+        <p>Career Reports Pending</p>
+      </div>
+    </div>
+
+    <!-- Student Records -->
+    <div id="students" class="panel">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="mb-1"><i class="bi bi-people"></i> All Students</h5>
+          <div class="small-muted">Counselor can open student profile, assessment report and career recommendations.</div>
+        </div>
+      </div>
+
+      <hr class="border-light opacity-25">
+
+      {% if students_data %}
+        <div class="student-grid">
+          {% for s in students_data %}
+            <div class="student-card">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="text-white fw-bold">
+                    {{ s.profile.full_name|default:s.user.username }}
+                  </div>
+                  <div class="small-muted">
+                    {{ s.profile.degree|default:"" }} {{ s.profile.branch|default:"" }}
+                    {% if s.profile.city %} • {{ s.profile.city }}{% endif %}
+                  </div>
+                </div>
+                <span class="badge bg-info text-dark">Student</span>
+              </div>
+
+              <hr class="border-light opacity-25">
+
+              {% if s.last_attempt %}
+                <div class="small-muted">
+                  Latest Assessment: <b class="text-white">{{ s.last_attempt.subject|default:"-" }}</b>
+                </div>
+                <div class="small-muted">
+                  Score: <b class="text-white">{{ s.last_attempt.score }}/{{ s.last_attempt.total }}</b>
+                  {% if s.score_pct != None %} ({{ s.score_pct }}%) {% endif %}
+                </div>
+                <div class="small-muted">Completed: {{ s.last_attempt.completed_at }}</div>
+              {% else %}
+                <div class="small-muted">No completed assessment yet.</div>
+              {% endif %}
+
+              <div class="small-muted mt-2">
+                Skills: {{ s.profile.skills|default:"-" }}
+              </div>
+
+              <div class="d-flex gap-2 flex-wrap mt-3">
+                <a class="btn btn-outline-light btn-sm" href="{% url 'counselor_student_profile' s.user.id %}">
+                  <i class="bi bi-person-badge"></i> Profile
+                </a>
+
+                <a class="btn btn-outline-info btn-sm" href="{% url 'counselor_student_assessment' s.user.id %}">
+                  <i class="bi bi-file-earmark-text"></i> Assessment
+                </a>
+
+                <a class="btn btn-success btn-sm" href="{% url 'counselor_student_career' s.user.id %}">
+                  <i class="bi bi-compass"></i> Career Report
+                </a>
+
+                {% if s.last_attempt and not s.report_exists %}
+                  <a class="btn btn-warning btn-sm"
+                     href="{% url 'counselor_student_career' s.user.id %}?generate=1">
+                    <i class="bi bi-stars"></i> Generate
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="small-muted">No students found.</div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+
+<footer class="text-center py-3" style="color:#dbe8ffaa;">
+  AI CareerWise — Smart AI Counseling Platform © 2025
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
